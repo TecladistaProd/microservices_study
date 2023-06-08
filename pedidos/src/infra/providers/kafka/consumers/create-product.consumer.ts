@@ -12,17 +12,19 @@ export async function createProductConsumer() {
 
   await consumer.run({
     eachMessage: async ({ message }) => {
-      const messageToString = message.value!.toString();
-      const product: TProductConsumer = JSON.parse(messageToString);
-
-      console.log('PRODUCT: ', product)
-
-      await prismaClient.product.create({
-        data: {
-          code: product.code,
-          external_id: product.id
-        }
-      })
+      try {
+        const messageToString = message.value!.toString();
+        const product: TProductConsumer = JSON.parse(messageToString);
+  
+        console.log('PRODUCT: ', product)
+  
+        await prismaClient.product.create({
+          data: {
+            code: product.code,
+            external_id: product.id
+          }
+        })
+      } catch(err) {}
     },
   });
 }

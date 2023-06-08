@@ -14,4 +14,4 @@ const interval_id = setInterval(async () => {
   } catch(err) {
     //
   }
-}, 5000);
+}, 10000);
