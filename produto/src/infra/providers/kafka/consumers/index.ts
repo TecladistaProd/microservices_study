@@ -1,0 +1,1 @@
+import './order-products.consumer';
