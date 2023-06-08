@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { prismaClient } from "../../infra/database/prismaClient";
 import { KafkaSendMessage } from "../../infra/provider/kafka/producer";
 
@@ -12,6 +13,15 @@ export class CreateClientUseCase {
   constructor() {}
 
   async execute(data: TCreateClientRequest) {
+    const verifyData = z.object({
+      name: z.string().max(50).min(3),
+      password: z.string(),
+      email: z.string().email(),
+      phone: z.string()
+    });
+
+    verifyData.parse(data);
+
     const customer = await prismaClient.client.findFirst({
       where: {
         email: data.email

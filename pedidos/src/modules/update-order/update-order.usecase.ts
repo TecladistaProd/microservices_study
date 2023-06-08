@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { prismaClient } from "../../infra/database/prismaClient";
 import { KafkaSendMessage } from "../../infra/providers/kafka/producer";
 
@@ -10,6 +11,12 @@ export class UpdateOrderUseCase {
   constructor () {}
 
   async execute(data: TUpdateOrderRequest) {
+    const verifyData = z.object({
+      id: z.string().uuid(),
+      status: z.string().min(5)
+    });
+
+    verifyData.parse(data);
     const orderUpdate = await prismaClient.order.update({
       where: {
         id: data.id,

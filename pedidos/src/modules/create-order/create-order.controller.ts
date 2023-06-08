@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { ZodError } from 'zod';
 import { CreateOrderUseCase } from './create-order.usecase';
 
 export class CreateOrderController {
@@ -11,10 +12,13 @@ export class CreateOrderController {
       const result = await useCase.execute(request.body);
       return response.status(201).json(result);
     } catch(err) {
-      if(err instanceof Error)
+      if(err instanceof ZodError)
+        return response.status(400).json({
+          message: JSON.parse(err.message),
+        });
+      else if(err instanceof Error)
         return response.status(400).json({
           message: err.message,
-          stack: err.stack
         });
       return response.status(400).json(err);
     }

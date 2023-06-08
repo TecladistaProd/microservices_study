@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { prismaClient } from "../../infra/database/prismaClient";
 
 type TCreateOrderRequest = {
@@ -15,6 +16,16 @@ export class CreateOrderUseCase {
     // Requisiçao para API de Produtos para verificar se tem estoque do produto
     // Neste caso axios.get
     // Caso tenha estoque cria order
+
+    const verifyData = z.object({
+      customerId: z.string().uuid(),
+      items: z.object({
+        productId: z.string().uuid(),
+        quantity: z.number().min(0),
+      }).array().min(1)
+    });
+
+    verifyData.parse(data);
 
     const order = await prismaClient.order.create({
       data: {

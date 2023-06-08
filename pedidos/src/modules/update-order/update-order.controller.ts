@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { ZodError } from 'zod';
 import { UpdateOrderUseCase } from "./update-order.usecase";
 
 export class UpdateOrderController {
@@ -8,13 +9,16 @@ export class UpdateOrderController {
     const useCase = new UpdateOrderUseCase();
 
     try {
-      const result = await useCase.execute(request.body);
+      const result = await useCase.execute({...request.body, ...request.params});
       return response.status(200).json(result);
     } catch(err) {
-      if(err instanceof Error)
+      if(err instanceof ZodError)
+        return response.status(400).json({
+          message: JSON.parse(err.message),
+        });
+      else if(err instanceof Error)
         return response.status(400).json({
           message: err.message,
-          stack: err.stack
         });
       return response.status(400).json(err);
     }
